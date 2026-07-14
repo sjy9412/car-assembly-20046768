@@ -11,13 +11,18 @@ python assemble.py
 # 가상 환경 활성화 (Windows)
 .venv\Scripts\activate
 
-# 테스트 실행 (Step 1 이후)
+# 테스트 실행
 pytest tests/ -v
+
+# 커버리지 포함 테스트
+pytest tests/ -v --cov=assemble --cov-report=term-missing
 ```
 
 ## Architecture
 
-단일 파일(`assemble.py`) Python 3.13 CLI 애플리케이션. 외부 의존성 없음.
+단일 파일(`assemble.py`) Python 3.13 CLI 애플리케이션.
+
+**의존성:** `pytest`, `pytest-cov` (테스트 전용, `.venv` 내 설치됨)
 
 ### 상태 관리
 
@@ -50,7 +55,7 @@ pytest tests/ -v
 
 리팩토링 계획은 `PLAN.md` 참조. Test-First 전략으로 5단계 진행.
 
-- Step 1: 테스트 기준선 작성 (현재 코드 기준 pytest)
+- ~~Step 1: 테스트 기준선 작성 (현재 코드 기준 pytest)~~ ✅ 완료 — 58 tests, 77% coverage
 - Step 2: 안전성 수정 (bare except, 하드코딩 상수, 미사용 변수)
 - Step 3: OOP 전환 (Enum + dataclass)
 - Step 4: 서비스 계층 도입 (호환성 규칙 통합)
