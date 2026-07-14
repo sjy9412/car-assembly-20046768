@@ -1,5 +1,5 @@
-import time
 import sys
+import time
 
 from models.car import Car
 from models.parts import Brake, CarType, Engine, Steering
@@ -14,34 +14,20 @@ brakeSystem_Q = 2
 SteeringSystem_Q = 3
 Run_Test = 4
 
-SEDAN = 1
-SUV = 2
-TRUCK = 3
-
-GM = 1
-TOYOTA = 2
-WIA = 3
-BROKEN = 4
-
-MANDO = 1
-CONTINENTAL = 2
-BOSCH_B = 3
-
-BOSCH_S = 1
-MOBIS = 2
-
 q0 = 0
 q1 = 0
 q2 = 0
 q3 = 0
 
+
 def delay(ms: int) -> None:
-    t = ms / 1000.0
-    time.sleep(t)
+    time.sleep(ms / 1000.0)
+
 
 def clear() -> None:
     sys.stdout.write(CLEAR_SCREEN)
     sys.stdout.flush()
+
 
 def show_menu(step: int) -> None:
     clear()
@@ -81,6 +67,7 @@ def show_menu(step: int) -> None:
         print("2. Test")
     print("===============================")
 
+
 def is_valid_range(step: int, ans: int) -> bool:
     if step == 0:
         if ans < 1 or ans > 3:
@@ -104,6 +91,7 @@ def is_valid_range(step: int, ans: int) -> bool:
             return False
     return True
 
+
 def select_car_type(a: int) -> None:
     global q0
     q0 = a
@@ -113,6 +101,7 @@ def select_car_type(a: int) -> None:
         print("차량 타입으로 SUV을 선택하셨습니다.")
     elif a == 3:
         print("차량 타입으로 Truck을 선택하셨습니다.")
+
 
 def select_engine(a: int) -> None:
     global q1
@@ -126,6 +115,7 @@ def select_engine(a: int) -> None:
     elif a == 4:
         print("고장난 엔진을 선택하셨습니다.")
 
+
 def select_brake(a: int) -> None:
     global q2
     q2 = a
@@ -136,6 +126,7 @@ def select_brake(a: int) -> None:
     elif a == 3:
         print("BOSCH 제동장치를 선택하셨습니다.")
 
+
 def select_steering(a: int) -> None:
     global q3
     q3 = a
@@ -143,6 +134,7 @@ def select_steering(a: int) -> None:
         print("BOSCH 조향장치를 선택하셨습니다.")
     elif a == 2:
         print("MOBIS 조향장치를 선택하셨습니다.")
+
 
 def _build_car() -> Car:
     return Car(
@@ -153,10 +145,7 @@ def _build_car() -> Car:
     )
 
 
-def is_valid_check() -> bool:
-    return check_compatibility(_build_car()).is_compatible
-
-def run_produced_car() -> None:
+def show_run_result() -> None:
     car = _build_car()
     assembler = Assembler()
     if not assembler.validate(car).is_compatible:
@@ -167,42 +156,43 @@ def run_produced_car() -> None:
         print("자동차가 움직이지 않습니다.")
         return
 
-    if q0 == SEDAN:
-        print("Car Type : Sedan")
-    elif q0 == SUV:
-        print("Car Type : SUV")
-    elif q0 == TRUCK:
-        print("Car Type : Truck")
+    car_type_labels = {
+        CarType.SEDAN: "Sedan",
+        CarType.SUV: "SUV",
+        CarType.TRUCK: "Truck",
+    }
+    engine_labels = {
+        Engine.GM: "GM",
+        Engine.TOYOTA: "TOYOTA",
+        Engine.WIA: "WIA",
+    }
+    brake_labels = {
+        Brake.MANDO: "Mando",
+        Brake.CONTINENTAL: "Continental",
+        Brake.BOSCH_B: "Bosch",
+    }
+    steering_labels = {
+        Steering.BOSCH_S: "Bosch",
+        Steering.MOBIS: "Mobis",
+    }
 
-    if q1 == GM:
-        print("Engine   : GM")
-    elif q1 == TOYOTA:
-        print("Engine   : TOYOTA")
-    elif q1 == WIA:
-        print("Engine   : WIA")
-
-    if q2 == MANDO:
-        print("Brake    : Mando")
-    elif q2 == CONTINENTAL:
-        print("Brake    : Continental")
-    elif q2 == BOSCH_B:
-        print("Brake    : Bosch")
-
-    if q3 == BOSCH_S:
-        print("Steering : Bosch")
-    elif q3 == MOBIS:
-        print("Steering : Mobis")
-
+    print(f"Car Type : {car_type_labels.get(car.car_type, '')}")
+    print(f"Engine   : {engine_labels.get(car.engine, '')}")
+    print(f"Brake    : {brake_labels.get(car.brake, '')}")
+    print(f"Steering : {steering_labels.get(car.steering, '')}")
     print("자동차가 동작됩니다.")
 
-def test_produced_car() -> None:
+
+def show_test_result() -> None:
     result = check_compatibility(_build_car())
     if result.is_compatible:
         print("PASS")
     else:
         print(result.message)
 
-def main() -> None:
+
+def run() -> None:
+    global q0, q1, q2, q3
     step = 0
     while True:
         show_menu(step)
@@ -227,7 +217,7 @@ def main() -> None:
             if step == 4:
                 step = 0
             elif step > 0:
-                step = step - 1
+                step -= 1
             continue
 
         if step == 0:
@@ -248,13 +238,10 @@ def main() -> None:
             step = 4
         elif step == 4:
             if ans == 1:
-                run_produced_car()
+                show_run_result()
                 delay(2000)
             elif ans == 2:
                 print("Test...")
                 delay(1500)
-                test_produced_car()
+                show_test_result()
                 delay(2000)
-
-if __name__ == "__main__":
-    main()

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # 프로그램 실행
-python assemble.py
+python main.py
 
 # 가상 환경 활성화 (Windows)
 .venv\Scripts\activate
@@ -28,13 +28,15 @@ Python 3.13 CLI 애플리케이션.
 
 ```
 car_assembly/
-├── assemble.py          # CLI 진입점 및 조립 로직 (전역 변수 q0~q3로 상태 관리)
+├── main.py              # CLI 진입점 (ui.menu.run() 호출)
 ├── models/
 │   ├── parts.py         # CarType / Engine / Brake / Steering IntEnum 정의
 │   └── car.py           # Car dataclass (is_complete, reset)
 ├── services/
 │   ├── compatibility.py # CompatibilityRule / CompatibilityResult / RULES / check_compatibility
 │   └── assembler.py     # Assembler 클래스 (validate, can_run)
+├── ui/
+│   └── menu.py          # 모든 입출력 처리 및 조립 흐름 제어 (run())
 └── tests/
     ├── test_models.py
     ├── test_compatibility.py
@@ -51,9 +53,9 @@ car_assembly/
 - `compatibility.py` — 호환성 검증 전담. `RULES` 리스트에 5가지 규칙을 `CompatibilityRule` dataclass로 보유. `check_compatibility(car)` 가 `Car` 객체를 받아 `CompatibilityResult`(is_compatible, message) 반환.
 - `assembler.py` — `Assembler` 클래스. `validate(car)` 는 호환성 검증, `can_run(car)` 는 고장난 엔진 + 호환성을 통합 판단.
 
-### 상태 관리 (`assemble.py`)
+### UI (`ui/`)
 
-전역 변수(`q0`~`q3`)로 조립 단계별 선택값을 유지한다.
+- `menu.py` — 모든 `print()` / `input()` 처리 담당. 전역 변수(`q0`~`q3`)로 조립 단계별 선택값을 유지. `run()` 함수가 이벤트 루프 진입점.
 
 | 변수 | 역할 | 선택값 |
 |------|------|--------|
@@ -64,13 +66,13 @@ car_assembly/
 
 ### 조립 흐름
 
-`main()` 이벤트 루프 → 입력 수신 → `is_valid_range()` 검증 → 각 `select_*()` 함수로 상태 저장 → 스텝 4에서 `run_produced_car()` / `test_produced_car()` 호출.
+`run()` 이벤트 루프 → 입력 수신 → `is_valid_range()` 검증 → 각 `select_*()` 함수로 상태 저장 → 스텝 4에서 `show_run_result()` / `show_test_result()` 호출.
 
 입력 `0`은 이전 단계로 돌아가는 뒤로가기이고, `exit` 입력 시 종료한다.
 
 ### 호환성 검증 규칙
 
-`services/compatibility.py`의 `RULES`에 정의되며, `assemble.py`의 `is_valid_check()` / `test_produced_car()`는 `check_compatibility()`를 통해 이 규칙을 사용한다.
+`services/compatibility.py`의 `RULES`에 정의되며, `ui/menu.py`는 `check_compatibility()` / `Assembler`를 통해 이 규칙을 사용한다.
 
 1. **Continental 제동장치 → Sedan 불가**
 2. **TOYOTA 엔진 → SUV 불가**
