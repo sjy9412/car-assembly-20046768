@@ -20,11 +20,29 @@ pytest tests/ -v --cov=assemble --cov-report=term-missing
 
 ## Architecture
 
-단일 파일(`assemble.py`) Python 3.13 CLI 애플리케이션.
+Python 3.13 CLI 애플리케이션.
 
 **의존성:** `pytest`, `pytest-cov` (테스트 전용, `.venv` 내 설치됨)
 
-### 상태 관리
+### 디렉토리 구조
+
+```
+car_assembly/
+├── assemble.py          # CLI 진입점 및 조립 로직
+├── models/
+│   ├── parts.py         # CarType / Engine / Brake / Steering IntEnum 정의
+│   └── car.py           # Car dataclass (is_complete, reset)
+└── tests/
+    ├── test_assemble.py
+    └── test_models.py
+```
+
+### 모델 (`models/`)
+
+- `parts.py` — `CarType`, `Engine`, `Brake`, `Steering` 을 `IntEnum`으로 정의. 정수 상수와 호환되므로 기존 코드와 혼용 가능.
+- `car.py` — `Car` dataclass. 4개 부품 필드(`car_type`, `engine`, `brake`, `steering`)를 `Optional`로 보유. `is_complete()` / `reset()` 메서드 제공.
+
+### 상태 관리 (`assemble.py`)
 
 전역 변수(`q0`~`q3`)로 조립 단계별 선택값을 유지한다.
 
@@ -48,5 +66,3 @@ pytest tests/ -v --cov=assemble --cov-report=term-missing
 3. **TOYOTA 엔진 → SUV 불가**
 4. **WIA 엔진 → Truck 불가**
 5. **MANDO 제동장치 → Truck 불가**
-
-동일한 규칙이 `is_valid_check()`와 `test_produced_car()` 두 곳에 중복 구현되어 있다.
