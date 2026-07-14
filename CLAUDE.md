@@ -10,6 +10,9 @@ python assemble.py
 
 # 가상 환경 활성화 (Windows)
 .venv\Scripts\activate
+
+# 테스트 실행 (Step 1 이후)
+pytest tests/ -v
 ```
 
 ## Architecture
@@ -18,15 +21,14 @@ python assemble.py
 
 ### 상태 관리
 
-전역 변수(`q0`~`q4`)로 조립 단계별 선택값을 유지한다.
+전역 변수(`q0`~`q3`)로 조립 단계별 선택값을 유지한다. (`q4`는 미사용)
 
-| 변수 | 단계 | 선택값 |
+| 변수 | 역할 | 선택값 |
 |------|------|--------|
-| `q0` | 진행 단계 (0~4) | 현재 스텝 |
-| `q1` | 차량 타입 | SEDAN(1) / SUV(2) / TRUCK(3) |
-| `q2` | 엔진 | GM(1) / TOYOTA(2) / WIA(3) |
-| `q3` | 제동장치 | MANDO(1) / CONTINENTAL(2) / BOSCH_B(3) |
-| `q4` | 조향장치 | BOSCH_S(1) / MOBIS(2) |
+| `q0` | 차량 타입 | SEDAN(1) / SUV(2) / TRUCK(3) |
+| `q1` | 엔진 | GM(1) / TOYOTA(2) / WIA(3) / 고장난 엔진(4) |
+| `q2` | 제동장치 | MANDO(1) / CONTINENTAL(2) / BOSCH_B(3) |
+| `q3` | 조향장치 | BOSCH_S(1) / MOBIS(2) |
 
 ### 조립 흐름
 
@@ -42,15 +44,15 @@ python assemble.py
 4. **WIA 엔진 → Truck 불가**
 5. **MANDO 제동장치 → Truck 불가**
 
-### 코드 구조
+동일한 규칙이 `is_valid_check()`와 `test_produced_car()` 두 곳에 중복 구현되어 있다.
 
-- **상수 (6~31줄):** 단계 식별자 및 부품 코드
-- **유틸 (33~39줄):** `delay()`, `clear()`
-- **메뉴/입력 (41~100줄):** `show_menu()`, `is_valid_range()`
-- **선택 저장 (102~141줄):** `select_car_type()`, `select_engine()`, `select_brake()`, `select_steering()`
-- **검증/실행 (142~204줄):** `is_valid_check()`, `run_produced_car()`, `test_produced_car()`
-- **메인 루프 (206~259줄):** `main()`
+## Refactoring
 
-## 코드 스타일
+리팩토링 계획은 `PLAN.md` 참조. Test-First 전략으로 5단계 진행.
 
-PyCharm Black formatter 설정 적용됨.
+- Step 1: 테스트 기준선 작성 (현재 코드 기준 pytest)
+- Step 2: 안전성 수정 (bare except, 하드코딩 상수, 미사용 변수)
+- Step 3: OOP 전환 (Enum + dataclass)
+- Step 4: 서비스 계층 도입 (호환성 규칙 통합)
+- Step 5: UI 분리 및 최종 구조 완성
+
