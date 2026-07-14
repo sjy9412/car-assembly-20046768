@@ -26,7 +26,7 @@ pytest tests/ -v --cov=assemble --cov-report=term-missing
 
 ### 상태 관리
 
-전역 변수(`q0`~`q3`)로 조립 단계별 선택값을 유지한다. (`q4`는 미사용)
+전역 변수(`q0`~`q3`)로 조립 단계별 선택값을 유지한다.
 
 | 변수 | 역할 | 선택값 |
 |------|------|--------|
@@ -50,14 +50,3 @@ pytest tests/ -v --cov=assemble --cov-report=term-missing
 5. **MANDO 제동장치 → Truck 불가**
 
 동일한 규칙이 `is_valid_check()`와 `test_produced_car()` 두 곳에 중복 구현되어 있다.
-
-## Refactoring
-
-리팩토링 계획은 `PLAN.md` 참조. Test-First 전략으로 5단계 진행.
-
-- ~~Step 1: 테스트 기준선 작성 (현재 코드 기준 pytest)~~ ✅ 완료 — 58 tests, 77% coverage
-- Step 2: 안전성 수정 (bare except, 하드코딩 상수, 미사용 변수)
-- Step 3: OOP 전환 (Enum + dataclass)
-- Step 4: 서비스 계층 도입 (호환성 규칙 통합)
-- Step 5: UI 분리 및 최종 구조 완성
-

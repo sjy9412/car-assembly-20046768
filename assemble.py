@@ -16,6 +16,7 @@ TRUCK = 3
 GM = 1
 TOYOTA = 2
 WIA = 3
+BROKEN = 4
 
 MANDO = 1
 CONTINENTAL = 2
@@ -28,17 +29,16 @@ q0 = 0
 q1 = 0
 q2 = 0
 q3 = 0
-q4 = 0
 
-def delay(ms):
+def delay(ms: int) -> None:
     t = ms / 1000.0
     time.sleep(t)
 
-def clear():
+def clear() -> None:
     sys.stdout.write(CLEAR_SCREEN)
     sys.stdout.flush()
 
-def show_menu(step):
+def show_menu(step: int) -> None:
     clear()
     if step == 0:
         print("        ______________")
@@ -76,22 +76,22 @@ def show_menu(step):
         print("2. Test")
     print("===============================")
 
-def is_valid_range(step, ans):
+def is_valid_range(step: int, ans: int) -> bool:
     if step == 0:
         if ans < 1 or ans > 3:
             print("ERROR :: 차량 타입은 1 ~ 3 범위만 선택 가능")
             return False
     if step == 1:
         if ans < 0 or ans > 4:
-            print("ERROR :: 엔진은 1 ~ 4 범위만 선택 가능")
+            print("ERROR :: 엔진은 0 ~ 4 범위만 선택 가능")
             return False
     if step == 2:
         if ans < 0 or ans > 3:
-            print("ERROR :: 제동장치는 1 ~ 3 범위만 선택 가능")
+            print("ERROR :: 제동장치는 0 ~ 3 범위만 선택 가능")
             return False
     if step == 3:
         if ans < 0 or ans > 2:
-            print("ERROR :: 조향장치는 1 ~ 2 범위만 선택 가능")
+            print("ERROR :: 조향장치는 0 ~ 2 범위만 선택 가능")
             return False
     if step == 4:
         if ans < 0 or ans > 2:
@@ -99,7 +99,7 @@ def is_valid_range(step, ans):
             return False
     return True
 
-def select_car_type(a):
+def select_car_type(a: int) -> None:
     global q0
     q0 = a
     if a == 1:
@@ -109,7 +109,7 @@ def select_car_type(a):
     elif a == 3:
         print("차량 타입으로 Truck을 선택하셨습니다.")
 
-def select_engine(a):
+def select_engine(a: int) -> None:
     global q1
     q1 = a
     if a == 1:
@@ -121,7 +121,7 @@ def select_engine(a):
     elif a == 4:
         print("고장난 엔진을 선택하셨습니다.")
 
-def select_brake(a):
+def select_brake(a: int) -> None:
     global q2
     q2 = a
     if a == 1:
@@ -131,7 +131,7 @@ def select_brake(a):
     elif a == 3:
         print("BOSCH 제동장치를 선택하셨습니다.")
 
-def select_steering(a):
+def select_steering(a: int) -> None:
     global q3
     q3 = a
     if a == 1:
@@ -139,7 +139,7 @@ def select_steering(a):
     elif a == 2:
         print("MOBIS 조향장치를 선택하셨습니다.")
 
-def is_valid_check():
+def is_valid_check() -> bool:
     if q0 == SEDAN and q2 == CONTINENTAL:
         return False
     if q0 == SUV and q1 == TOYOTA:
@@ -152,44 +152,44 @@ def is_valid_check():
         return False
     return True
 
-def run_produced_car():
+def run_produced_car() -> None:
     if not is_valid_check():
         print("자동차가 동작되지 않습니다")
         return
-    if q1 == 4:
+    if q1 == BROKEN:
         print("엔진이 고장나있습니다.")
         print("자동차가 움직이지 않습니다.")
         return
 
-    if q0 == 1:
+    if q0 == SEDAN:
         print("Car Type : Sedan")
-    elif q0 == 2:
+    elif q0 == SUV:
         print("Car Type : SUV")
-    elif q0 == 3:
+    elif q0 == TRUCK:
         print("Car Type : Truck")
 
-    if q1 == 1:
+    if q1 == GM:
         print("Engine   : GM")
-    elif q1 == 2:
+    elif q1 == TOYOTA:
         print("Engine   : TOYOTA")
-    elif q1 == 3:
+    elif q1 == WIA:
         print("Engine   : WIA")
 
-    if q2 == 1:
+    if q2 == MANDO:
         print("Brake    : Mando")
-    elif q2 == 2:
+    elif q2 == CONTINENTAL:
         print("Brake    : Continental")
-    elif q2 == 3:
+    elif q2 == BOSCH_B:
         print("Brake    : Bosch")
 
-    if q3 == 1:
+    if q3 == BOSCH_S:
         print("Steering : Bosch")
-    elif q3 == 2:
+    elif q3 == MOBIS:
         print("Steering : Mobis")
 
     print("자동차가 동작됩니다.")
 
-def test_produced_car():
+def test_produced_car() -> None:
     if q0 == SEDAN and q2 == CONTINENTAL:
         print("FAIL\nSedan에는 Continental제동장치 사용 불가")
     elif q0 == SUV and q1 == TOYOTA:
@@ -203,7 +203,7 @@ def test_produced_car():
     else:
         print("PASS")
 
-def main():
+def main() -> None:
     step = 0
     while True:
         show_menu(step)
@@ -215,7 +215,7 @@ def main():
 
         try:
             ans = int(buf)
-        except:
+        except ValueError:
             print("ERROR :: 숫자만 입력 가능")
             delay(800)
             continue
