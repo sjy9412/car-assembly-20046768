@@ -1,6 +1,11 @@
 import time
 import sys
 
+from models.car import Car
+from models.parts import Brake, CarType, Engine, Steering
+from services.assembler import Assembler
+from services.compatibility import check_compatibility
+
 CLEAR_SCREEN = "\033[H\033[2J"
 
 CarType_Q = 0
@@ -139,24 +144,25 @@ def select_steering(a: int) -> None:
     elif a == 2:
         print("MOBIS 조향장치를 선택하셨습니다.")
 
+def _build_car() -> Car:
+    return Car(
+        car_type=CarType(q0) if q0 != 0 else None,
+        engine=Engine(q1) if q1 != 0 else None,
+        brake=Brake(q2) if q2 != 0 else None,
+        steering=Steering(q3) if q3 != 0 else None,
+    )
+
+
 def is_valid_check() -> bool:
-    if q0 == SEDAN and q2 == CONTINENTAL:
-        return False
-    if q0 == SUV and q1 == TOYOTA:
-        return False
-    if q0 == TRUCK and q1 == WIA:
-        return False
-    if q0 == TRUCK and q2 == MANDO:
-        return False
-    if q2 == BOSCH_B and q3 != BOSCH_S:
-        return False
-    return True
+    return check_compatibility(_build_car()).is_compatible
 
 def run_produced_car() -> None:
-    if not is_valid_check():
+    car = _build_car()
+    assembler = Assembler()
+    if not assembler.validate(car).is_compatible:
         print("자동차가 동작되지 않습니다")
         return
-    if q1 == BROKEN:
+    if not assembler.can_run(car):
         print("엔진이 고장나있습니다.")
         print("자동차가 움직이지 않습니다.")
         return
@@ -190,18 +196,11 @@ def run_produced_car() -> None:
     print("자동차가 동작됩니다.")
 
 def test_produced_car() -> None:
-    if q0 == SEDAN and q2 == CONTINENTAL:
-        print("FAIL\nSedan에는 Continental제동장치 사용 불가")
-    elif q0 == SUV and q1 == TOYOTA:
-        print("FAIL\nSUV에는 TOYOTA엔진 사용 불가")
-    elif q0 == TRUCK and q1 == WIA:
-        print("FAIL\nTruck에는 WIA엔진 사용 불가")
-    elif q0 == TRUCK and q2 == MANDO:
-        print("FAIL\nTruck에는 Mando제동장치 사용 불가")
-    elif q2 == BOSCH_B and q3 != BOSCH_S:
-        print("FAIL\nBosch제동장치에는 Bosch조향장치 이외 사용 불가")
-    else:
+    result = check_compatibility(_build_car())
+    if result.is_compatible:
         print("PASS")
+    else:
+        print(result.message)
 
 def main() -> None:
     step = 0
